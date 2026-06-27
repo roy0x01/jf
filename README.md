@@ -1,16 +1,10 @@
 <div align="center">
 
-<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-  <rect width="80" height="80" rx="16" fill="#0d1117"/>
-  <text x="12" y="52" font-family="monospace" font-size="38" font-weight="bold" fill="#EAB308">{</text>
-  <text x="44" y="52" font-family="monospace" font-size="38" font-weight="bold" fill="#75B8F0">}</text>
-  <rect x="10" y="58" width="60" height="3" rx="1.5" fill="#EAB308" opacity="0.4"/>
-  <text x="22" y="73" font-family="monospace" font-size="10" fill="#6B7280" letter-spacing="6">jf</text>
-</svg>
+<img src="logo.svg" width="120" height="120" alt="jf logo" />
 
 # jf
 
-**JSON formatter and filter for daily use**
+**JSON formatter and filter for daily terminal use**
 
 ![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-EAB308?style=flat-square)
@@ -20,23 +14,35 @@
 
 ---
 
+`jf` pretty-prints JSON and JSONL files with syntax highlighting and lets you filter records using a simple deep path syntax — no jq required.
+
 ## Install
 
-**With Go:**
 ```bash
 go install github.com/roy0x01/jf@latest
 ```
 
-**Binary download** — [releases page](https://github.com/roy0x01/jf/releases/latest)
+**Binary install:**
 
 ```bash
-# Linux
+# Linux (amd64)
 curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-linux-amd64 -o jf
+chmod +x jf && sudo mv jf /usr/local/bin/
+
+# Linux (arm64)
+curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-linux-arm64 -o jf
+chmod +x jf && sudo mv jf /usr/local/bin/
+
+# macOS (Intel)
+curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-darwin-amd64 -o jf
 chmod +x jf && sudo mv jf /usr/local/bin/
 
 # macOS (Apple Silicon)
 curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-darwin-arm64 -o jf
 chmod +x jf && sudo mv jf /usr/local/bin/
+
+# Windows (amd64)
+curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-windows-amd64.exe -o jf.exe
 ```
 
 ---
@@ -47,20 +53,18 @@ chmod +x jf && sudo mv jf /usr/local/bin/
 jf <input> [-o output] [--filter path[=value]]
 ```
 
-| Command | Description |
+| Command | What it does |
 |---|---|
-| `jf data.json` | Pretty-print with color to terminal |
-| `jf data.json -o pretty.json` | Save plain output to file |
-| `jf logs.jsonl --filter key=value` | Filter and print matching records |
+| `jf data.json` | Pretty-print with color |
+| `jf data.json -o pretty.json` | Pretty-print and save to file |
+| `jf logs.jsonl --filter key=value` | Filter matching records |
 | `jf logs.jsonl --filter key=value -o out.jsonl` | Filter and save |
+
+The input file is **never modified** unless `-o` points back to it.
 
 ---
 
-## Features
-
-**Auto-detects JSON and JSONL** — no flags needed, format is inferred from content.
-
-**Syntax highlighting**
+## Color scheme
 
 | Token | Color |
 |---|---|
@@ -69,72 +73,51 @@ jf <input> [-o output] [--filter path[=value]]
 | Numbers | Coral |
 | Booleans | Violet |
 | Null | Grey |
-| Braces / Brackets | Gold |
-
-**Deep path filtering** — traverse nested objects and arrays with a simple path syntax.
-
-**Files are never modified** unless `-o` is specified.
+| `{ } [ ]` | Gold |
 
 ---
 
-## Filter path syntax
+## Filter
 
-```
-key                   top-level key
-a.b                   nested key
-a.0.b                 array index then key
-a[*].b                wildcard — all array elements, then key b
-a[*].b[*].c           nested wildcards
-```
-
-### Examples
+Filter with a dot-notation path, optionally with a value to match.
 
 ```bash
-# existence check — records that have the key
+# key exists
 jf logs.jsonl --filter event
 
-# value match
+# key equals value
 jf logs.jsonl --filter event=login
 jf logs.jsonl --filter member.role=admin
 jf logs.jsonl --filter member.active=false
 
-# array wildcard
+# array wildcard [*]
 jf scan.json --filter hosts[*].ip=10.0.0.1
 jf scan.json --filter hosts[*].ports[*].state=open
 
-# nested wildcards
-jf dump.json --filter teams[*].members[*].role=lead
-
-# specific index
+# specific array index
 jf data.jsonl --filter results.0.severity=critical
 
-# filter + save
+# filter and save
 jf audit.jsonl --filter severity=critical -o hits.jsonl
 ```
 
----
+### Path syntax
 
-## Filter behaviour
-
-| Input type | Filter behaviour |
+| Expression | Meaning |
 |---|---|
-| JSONL | Each line is a record; matching lines are kept |
-| JSON array `[…]` | Each element tested independently; matching elements returned |
+| `key` | Top-level key |
+| `a.b` | Nested key |
+| `a.0.b` | Array index then key |
+| `a[*].b` | All array elements, then key |
+| `a[*].b[*].c` | Nested wildcards |
+
+### Filter behaviour by file type
+
+| Input | Behaviour |
+|---|---|
+| JSONL | Each line is a record — matching lines are kept |
+| JSON array `[…]` | Each element tested independently |
 | JSON object `{…}` | Whole document tested as one record |
-
----
-
-## Sample files
-
-[`sample.json`](sample.json) — nested object with teams, members, ops, and meta  
-[`sample.jsonl`](sample.jsonl) — 5 op records with nested member objects
-
-Try it:
-```bash
-jf sample.json
-jf sample.jsonl --filter severity=critical
-jf sample.json --filter "teams[*].members[*].role=lead"
-```
 
 ---
 
