@@ -22,29 +22,6 @@
 go install github.com/roy0x01/jf@latest
 ```
 
-**Binary install:**
-
-```bash
-# Linux (amd64)
-curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-linux-amd64 -o jf
-chmod +x jf && sudo mv jf /usr/local/bin/
-
-# Linux (arm64)
-curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-linux-arm64 -o jf
-chmod +x jf && sudo mv jf /usr/local/bin/
-
-# macOS (Intel)
-curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-darwin-amd64 -o jf
-chmod +x jf && sudo mv jf /usr/local/bin/
-
-# macOS (Apple Silicon)
-curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-darwin-arm64 -o jf
-chmod +x jf && sudo mv jf /usr/local/bin/
-
-# Windows (amd64)
-curl -L https://github.com/roy0x01/jf/releases/latest/download/jf-windows-amd64.exe -o jf.exe
-```
-
 ---
 
 ## Usage
